@@ -152,7 +152,6 @@
     <div class="headbtn" id="refreshBtn">↻</div>
   </div>
 </header>
-<div class="topstat" id="stat">正确率 --</div>
 <div class="progress-bar-wrap" id="progressBarWrap"><div class="progress-bar-fill" id="progressBarFill"></div></div>
 
 <div class="checkin" id="checkin">
@@ -261,7 +260,7 @@ let isDailyComplete=false;if(mode==='today'){const ts=readTodaySet();if(ts&&ts.d
 const opts=parseOptions(q).map(o=>{let cls='opt';if(answered){if(q.answer.includes(o.key))cls+=' correct';else if(selected.includes(o.key))cls+=' wrong';}else if(selected.includes(o.key))cls+=' sel';return '<div class="'+cls+'" data-key="'+o.key+'"><span class="optkey">'+o.key+'</span><span>'+escapeHtml(o.text)+'</span></div>';}).join('');
 const tl=q.type==='multiple'?'【多选】':'【单选】';const tags=(q.tags||[]).map(t=>'<span class="tag">'+escapeHtml(t)+'</span>').join('');const ct=chapters[q.chapter]?'<span class="chap-tag">'+escapeHtml(chapters[q.chapter])+'</span>':'';const cp=chapterPosMap[q.id]||'?';const ctag='<span class="tag" style="color:var(--warn)">#'+cp+'</span>';const isFav=isFaved(q.id);let prefix='';if(mode==='wrong'||mode==='review')prefix='<div class="backrow"><span id="backWrong">← 返回</span></div>';
 let sep='';if(mode==='today'){const ts=readTodaySet();const sc=ts?(ts.sc||0):0;if(sc>0&&sc<questions.length&&idx===sc)sep='<div class="typesep"><span>多选题区</span></div>';}
-let h=prefix+sep+'<div class="card">';h+='<div class="qmeta"><span class="qtype">'+tl+'</span>'+ct+ctag+tags+'<span class="fav-star'+(isFav?' on':'')+'" id="favStar" data-id="'+q.id+'">'+(isFav?'★':'☆')+'</span></div>';
+let h=prefix+sep+'<div class="card">';h+='<div class="qmeta"><span class="qtype">'+tl+'</span>'+ct+ctag+tags+'</div>';
 h+='<div class="stem"><span class="qnum">'+(idx+1)+'.</span> '+escapeHtml(q.stem)+'</div><div id="opts">'+opts+'</div>';
 const qc=isResultCorrect(q.id);h+='<div class="result '+(answered?(qc?'ok':'no'):'')+(answered?' show':'')+'" id="result">'+(answered?(qc?'✓ 正确':'✗ 错误'):'')+'</div>';
 h+='<div class="analysis '+(answered?'show':'')+'" id="analysis"><b>答案：</b>'+q.answer.join('、')+'<br><b>解析：</b>'+escapeHtml(q.analysis)+'</div>';
