@@ -1,0 +1,8 @@
+{
+  "dailyCount": 10,
+  "type": "mix",
+  "searchOnline": true,
+  "subject": "广东省二级造价师-安装工程",
+  "sourceDir": "F:/AI文件/WorkBuddy/广东清单定额/",
+  "remark": "改 dailyCount 即可调整每日题数；type: single=仅单选, multiple=仅多选, mix=混合；searchOnline: true=联网搜广东二造真题素材"
+}
