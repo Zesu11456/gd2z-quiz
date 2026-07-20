@@ -18,7 +18,7 @@
   header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;gap:4px;padding-top:env(safe-area-inset-top,0px);}
   h1{font-size:14px;margin:0;flex:1;}
   .headbtn{font-size:11px;padding:4px 8px;background:var(--headbtn-bg);color:var(--sub);border:1px solid var(--line);border-radius:6px;cursor:pointer;white-space:nowrap;}
-  .headbtn.on{color:var(--ok);border-color:var(--ok);background:var(--ok-bg);}.headbtn.inst{color:var(--blue);border-color:var(--blue);background:var(--primary-bg);}
+  .headbtn.on{color:var(--ok);border-color:var(--ok);background:var(--ok-bg);border-width:2px;font-weight:600;}.headbtn.inst{color:var(--blue);border-color:var(--blue);background:var(--primary-bg);border-width:2px;font-weight:600;}
   .headbtns{display:flex;gap:4px;}
   .topstat{font-size:11px;color:var(--sub);text-align:right;margin:0 0 3px 0;line-height:1.2;}
   .topstat b{color:var(--ok)}
@@ -153,7 +153,7 @@
   </div>
 </header>
 <div id="stat" style="display:none"></div>
-<div class="progress-bar-wrap" id="progressBarWrap"><div class="progress-bar-fill" id="progressBarFill"></div></div>
+<!-- 进度条已移除 -->
 
 <div class="checkin" id="checkin">
   <div class="ci-left">🔥<b id="streak">0</b>天　今日 <b id="todayDone">0</b>/<b id="todayGoal">30</b></div>
