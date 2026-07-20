@@ -157,7 +157,7 @@
 
 <div class="checkin" id="checkin">
   <div class="ci-left">🔥<b id="streak">0</b>天　今日 <b id="todayDone">0</b>/<b id="todayGoal">30</b></div>
-  <div class="ci-right"><span><b class="c" id="todayCorrect">0</b>/<b class="w" id="todayWrong">0</b></span><button class="ci-btn go" id="ciBtn">打卡</button></div>
+  <div class="ci-right"><button class="ci-btn go" id="ciBtn">打卡</button></div>
 </div>
 <div class="stats-panel" id="statsPanel"></div>
 <div class="modes">
@@ -226,7 +226,7 @@ function saveCheckins(a){localStorage.setItem(CHECKIN_KEY,JSON.stringify(a));}
 function isCheckedToday(){return getCheckins().includes(todayStr());}
 function doCheckIn(silent){const a=getCheckins(),t=todayStr();if(!a.includes(t)){a.push(t);saveCheckins(a);}renderCheckin();if(!silent)showToast('✅ 打卡成功！');}
 function getStreak(){const a=getCheckins().slice().sort();if(!a.length)return 0;let streak=0;const d=new Date();d.setHours(0,0,0,0);const todayS=todayStr();let cursor=a.includes(todayS)?new Date(d):new Date(d.getTime()-86400000);cursor.setHours(0,0,0,0);for(;;){const y=cursor.getFullYear(),m=String(cursor.getMonth()+1).padStart(2,'0'),day=String(cursor.getDate()).padStart(2,'0'),key=y+'-'+m+'-'+day;if(a.includes(key)){streak++;cursor=new Date(cursor.getTime()-86400000);}else break;}return streak;}
-function renderCheckin(){const s=getSettings();const ts=readTodaySet();const today=todayStr();const goal=(ts&&ts.date===today&&ts.ids.length)?ts.ids.length:((s.singleCount||0)+(s.multiCount||0));const done=(ts&&ts.date===today)?ts.answered.length:0;document.getElementById('todayGoal').textContent=goal;document.getElementById('todayDone').textContent=done;document.getElementById('streak').textContent=getStreak();const ds=getDailyScore();document.getElementById('todayCorrect').textContent=ds.correct;document.getElementById('todayWrong').textContent=ds.wrong;const btn=document.getElementById('ciBtn');if(isCheckedToday()){btn.textContent='已打卡';btn.className='ci-btn done';btn.disabled=false;}else if(goal>0&&done>=goal){btn.textContent='打卡✓';btn.className='ci-btn go';btn.disabled=false;}else{btn.textContent='未完成 '+done+'/'+goal;btn.className='ci-btn disabled';btn.disabled=true;}}
+function renderCheckin(){const s=getSettings();const ts=readTodaySet();const today=todayStr();const goal=(ts&&ts.date===today&&ts.ids.length)?ts.ids.length:((s.singleCount||0)+(s.multiCount||0));const done=(ts&&ts.date===today)?ts.answered.length:0;document.getElementById('todayGoal').textContent=goal;document.getElementById('todayDone').textContent=done;document.getElementById('streak').textContent=getStreak();const btn=document.getElementById('ciBtn');if(isCheckedToday()){btn.textContent='已打卡';btn.className='ci-btn done';btn.disabled=false;}else if(goal>0&&done>=goal){btn.textContent='打卡✓';btn.className='ci-btn go';btn.disabled=false;}else{btn.textContent='未完成 '+done+'/'+goal;btn.className='ci-btn disabled';btn.disabled=true;}}
 function getSeen(){try{return JSON.parse(localStorage.getItem(SEEN_KEY)||'[]')}catch(e){return[]}}
 function saveSeen(a){localStorage.setItem(SEEN_KEY,JSON.stringify(a));}
 function readTodaySet(){try{return JSON.parse(localStorage.getItem(TODAYSET_KEY))}catch(e){return null}}
