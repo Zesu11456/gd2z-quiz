@@ -145,7 +145,7 @@
 <header>
   <h1 id="h1title">广东二造·安装刷题</h1>
   <div class="headbtns">
-    <div class="headbtn on" id="themeBtn">🌙</div>
+    <div class="headbtn" id="themeBtn">🌙</div>
     <div class="headbtn inst" id="subjBtn">📚 安装</div>
     <div class="headbtn" id="searchBtn">🔍</div>
     <div class="headbtn" id="setBtn">⚙</div>
@@ -244,7 +244,7 @@ function saveResult(id,correct){const r=getResults();r[id]={correct,selected:sel
 function getSavedSelection(qid){const r=getResults()[qid];if(!r)return null;if(typeof r==='boolean')return{correct:r,selected:[]};return r;}
 function isResultCorrect(qid){const r=getResults()[qid];if(r===undefined)return undefined;return(typeof r==='boolean')?r:!!r.correct;}
 function updateStat(){if(mode==='today'){const ds=getDailyScore();const t=ds.correct+ds.wrong;document.getElementById('stat').textContent=t?'正确率 '+Math.round(ds.correct/t*100)+'%':'正确率 --';updateProgressBar(t?ds.correct/t:0);return;}if(mode==='all'){const r=getResults(),ch=(currentChapter!=='__all__')?currentChapter:null;let t=0,ok=0;for(const q of allList){if(ch&&q.chapter!==ch)continue;if(r[q.id]!==undefined){t++;if(isResultCorrect(q.id))ok++;}}document.getElementById('stat').textContent=t?'正确率 '+Math.round(ok/t*100)+'%':'正确率 --';updateProgressBar(t?ok/t:0);return;}const r=getResults(),vals=Object.values(r);if(!vals.length){document.getElementById('stat').textContent='正确率 --';updateProgressBar(0);return;}const ok=vals.filter(v=>(typeof v==='boolean')?v:!!v.correct).length;document.getElementById('stat').textContent='正确率 '+Math.round(ok/vals.length*100)+'%';updateProgressBar(ok/vals.length);}
-function updateProgressBar(ratio){const w=document.getElementById('progressBarWrap'),f=document.getElementById('progressBarFill');f.style.width=Math.round(ratio*100)+'%';}
+function updateProgressBar(ratio){}
 function updateStatsPanel(){const p=document.getElementById('statsPanel');if(mode==='today'){const ds=getDailyScore(),ts=getTodaySet(),t=ts&&ts.date===todayStr()?ts.answered.length:0;p.innerHTML='<div class="stats-item total"><div class="num">'+t+'</div><div class="label">已答</div></div><div class="stats-item ok"><div class="num">'+ds.correct+'</div><div class="label">正确</div></div><div class="stats-item err"><div class="num">'+ds.wrong+'</div><div class="label">错误</div></div><div class="stats-item rate"><div class="num">'+(ds.correct+ds.wrong>0?Math.round(ds.correct/(ds.correct+ds.wrong)*100)+'%':'-')+'</div><div class="label">正确率</div></div>';p.style.display='flex';}else if(mode==='review'){const r=getResults();const done=Object.keys(r).length;const ok=Object.values(r).filter(v=>(typeof v==='boolean')?v:!!v.correct).length;const favs=getFavs().length;const wgs=getWrongIds().length;p.innerHTML='<div class="stats-item total"><div class="num">'+done+'</div><div class="label">已答</div></div><div class="stats-item ok"><div class="num">'+ok+'</div><div class="label">正确</div></div><div class="stats-item err"><div class="num">'+wgs+'</div><div class="label">错题</div></div><div class="stats-item rate"><div class="num">'+(done>0?Math.round(ok/done*100)+'%':'-')+'</div><div class="label">正确率</div></div><div class="stats-item" style="color:var(--favorite)"><div class="num">'+favs+'</div><div class="label">收藏</div></div>';p.style.display='flex';}else p.style.display='none';}
 function parseOptions(q){if(Array.isArray(q.options))return q.options;return Object.keys(q.options).map(k=>({key:k,text:q.options[k]}));}
 function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -321,7 +321,7 @@ document.getElementById('searchBtn').addEventListener('click',()=>{document.getE
 document.getElementById('closeSearch').addEventListener('click',closeSearch);document.getElementById('searchMask').addEventListener('click',function(e){if(e.target===this)closeSearch();});
 document.getElementById('searchInput').addEventListener('input',function(){doSearch(this.value);});
 document.getElementById('closeNav').addEventListener('click',closeNav);document.getElementById('navMask').addEventListener('click',function(e){if(e.target===this)closeNav();});
-updateStat();renderCheckin();setTheme(getTheme());updateUI();loadBank();
+updateStat();renderCheckin();updateThemeBtn();setTheme(getTheme());updateUI();loadBank();
 </script>
 </body>
 </html>
