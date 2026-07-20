@@ -18,7 +18,7 @@
   header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;gap:4px;padding-top:env(safe-area-inset-top,0px);}
   h1{font-size:14px;margin:0;flex:1;}
   .headbtn{font-size:11px;padding:4px 8px;background:var(--headbtn-bg);color:var(--sub);border:1px solid var(--line);border-radius:6px;cursor:pointer;white-space:nowrap;}
-  .headbtn.on{color:var(--ok);border-color:var(--ok);background:var(--ok-bg);}
+  .headbtn.on{color:var(--ok);border-color:var(--ok);background:var(--ok-bg);}.headbtn.inst{color:var(--blue);border-color:var(--blue);background:var(--primary-bg);}
   .headbtns{display:flex;gap:4px;}
   .topstat{font-size:11px;color:var(--sub);text-align:right;margin:0 0 3px 0;line-height:1.2;}
   .topstat b{color:var(--ok)}
@@ -211,7 +211,7 @@ let WRONG_KEY,RESULT_KEY,STREAK_KEY,CHECKIN_KEY,SEEN_KEY,TODAYSET_KEY,DAILYSCORE
 function initKeys(){const p=getPrefix();WRONG_KEY=p+'wrong_ids';RESULT_KEY=p+'results';STREAK_KEY=p+'streaks';CHECKIN_KEY=p+'checkins';SEEN_KEY=p+'seen';TODAYSET_KEY=p+'todayset';DAILYSCORE_KEY=p+'dailyscore';FAV_KEY=p+'favorites';}
 const BANK={today:'',all:'',index:''};
 function updateBank(){BANK.today=subject==='安装'?'题库/today.json':'../管理刷题/题库/today.json';BANK.all=subject==='安装'?'题库/all_questions.js':'../管理刷题/题库/all_questions.js';BANK.index=subject==='安装'?'题库/index.json':'../管理刷题/题库/index.json';}
-function updateUI(){document.getElementById('h1title').textContent='广东二造·'+subject+'刷题';document.getElementById('subjBtn').textContent='📚 '+subject;document.getElementById('subjBtn').classList.toggle('on',subject==='管理');updateStat();}
+function updateUI(){document.getElementById('h1title').textContent='广东二造·'+subject+'刷题';document.getElementById('subjBtn').textContent='📚 '+subject;document.getElementById('subjBtn').className='headbtn'+(subject==='安装'?' inst':' on');updateStat();}
 initKeys();updateBank();
 let todayList=[],allList=[],chapters={},questions=[],idx=0,mode='today',currentChapter='__all__',answered=false,selected=[],wrongListView=true,chapterPosMap={},lastFinishClicked=false,isLoading=false;
 function getFavs(){try{return JSON.parse(localStorage.getItem(FAV_KEY)||'[]')}catch(e){return[]}}
