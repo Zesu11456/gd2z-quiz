@@ -38,10 +38,11 @@
   h1 { font-size:16px; margin:0; flex:1; }
   .headbtns { display:flex; gap:6px; }
   .headbtn { font-size:12px; padding:6px 10px; background:var(--headbtn-bg); color:var(--sub); border:1px solid var(--line); border-radius:8px; cursor:pointer; white-space:nowrap; }
-  .headbtn.on{color:var(--ok);border-color:var(--ok);background:var(--ok-bg);border-width:1.5px;font-weight:600;}.headbtn.day{color:var(--blue);border-color:var(--blue);background:var(--primary-bg);border-width:1.5px;font-weight:600;}.headbtn.inst{color:var(--ok);border-color:var(--ok);background:var(--ok-bg);border-width:1.5px;font-weight:600;}
+  .headbtn.on { color:var(--ok); border-color:var(--ok); background:var(--ok-bg); border-width:1.5px; font-weight:600; }
+  .headbtn.day { color:var(--blue); border-color:var(--blue); background:var(--primary-bg); border-width:1.5px; font-weight:600; }
   .stat { font-size:12px; color:var(--sub); width:100%; text-align:right; margin-bottom:6px; }
   .modes { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
-  .mode { flex:1; min-width:64px; text-align:center; padding:9px 0; background:var(--card); border:1px solid var(--line); border-radius:10px; font-size:13px; color:var(--sub); cursor:pointer; }
+  .mode { flex:1; min-width:56px; text-align:center; padding:9px 4px; background:var(--card); border:1px solid var(--line); border-radius:10px; font-size:12px; color:var(--sub); cursor:pointer; }
   .mode.active { color:var(--primary-tx); border-color:var(--primary); background:var(--primary-bg); }
   .chapbar { display:flex; gap:6px; overflow-x:auto; margin-bottom:10px; padding-bottom:4px; -webkit-overflow-scrolling:touch; }
   .chapbar::-webkit-scrollbar { height:0; }
@@ -153,6 +154,15 @@
   .wrow:active { border-color:var(--primary); }
   .backrow span { background:var(--primary-bg); border-width:2px; border-style:solid; border-color:var(--blue); color:var(--primary-tx); }
   .backrow span:active { background:var(--primary-active); }
+  .favstar { cursor:pointer; font-size:18px; user-select:none; margin-left:auto; color:var(--sub); transition:.2s; flex:none; }
+  .favstar.on { color:#f1c40f; }
+  .favlist { margin-bottom:12px; }
+  .frow { display:flex; align-items:center; gap:6px; padding:14px 16px; background:var(--card); border:1px solid var(--line); border-radius:12px; margin-bottom:10px; font-size:15px; cursor:pointer; line-height:1.45; }
+  .frow:active { border-color:var(--warn); }
+  .frow .fname { flex:1; }
+  .frow .fcnt { color:var(--warn); font-size:14px; font-weight:700; white-space:nowrap; }
+  .frow.fzero .fname { color:var(--sub); }
+  .frow.fzero .fcnt { color:var(--sub); font-weight:500; }
 </style>
 </head>
 <body>
@@ -160,7 +170,7 @@
   <h1 id="h1title">广东二造·安装刷题</h1>
   <div class="headbtns">
     <div class="headbtn on" id="themeBtn">🌙 夜间</div>
-    <div class="headbtn day" id="subjBtn">📚 安装</div>
+    <div class="headbtn inst" id="subjBtn">📚 安装</div>
     <div class="headbtn" id="setBtn">⚙ 设置</div>
     <div class="headbtn" id="refreshBtn">↻</div>
   </div>
@@ -176,10 +186,10 @@
 </div>
 
 <div class="modes">
-  <div class="mode active" data-mode="today">今日</div>
-  <div class="mode" data-mode="fav">收藏</div>
-  <div class="mode" data-mode="all">题库</div>
+  <div class="mode active" data-mode="today">今日练习</div>
+  <div class="mode" data-mode="all">全部题库</div>
   <div class="mode" data-mode="wrong">错题本</div>
+  <div class="mode" data-mode="fav">⭐ 收藏</div>
 </div>
 
 <div class="chapbar" id="chapbar" style="display:none;"></div>
@@ -272,14 +282,17 @@ function initKeys(){
 const BANK = { today:'', all:'', index:'' };
 function updateBank(){
   // 相对路径: 本地服务 + GitHub Pages 都适用
-  BANK.today = subject==='安装' ? '安装刷题/题库/today.json' : '管理刷题/题库/today.json';
-  BANK.all  = subject==='安装' ? '安装刷题/题库/all_questions.js' : '管理刷题/题库/all_questions.js';
-  BANK.index = subject==='安装' ? '安装刷题/题库/index.json' : '管理刷题/题库/index.json';
+  BANK.today = subject==='安装' ? '题库/today.json' : '../管理刷题/题库/today.json';
+  BANK.all  = subject==='安装' ? '题库/all_questions.js' : '../管理刷题/题库/all_questions.js';
+  BANK.index = subject==='安装' ? '题库/index.json' : '../管理刷题/题库/index.json';
 }
 function updateUI(){
   document.getElementById('h1title').textContent='广东二造·'+subject+'刷题';
   document.getElementById('subjBtn').textContent='📚 '+subject;
-  document.getElementById('subjBtn').classList.toggle('on', subject==='管理');
+  // 安装=蓝框(day), 管理=绿框(on)
+  const sb=document.getElementById('subjBtn');
+  sb.classList.remove('on','day');
+  sb.classList.add(subject==='管理'?'on':'day');
   updateStat();
 }
 
@@ -416,6 +429,12 @@ function regenIfClean(){
 function getWrongIds(){ try { return JSON.parse(localStorage.getItem(WRONG_KEY)||'[]'); } catch(e){ return []; } }
 function addWrong(id){ const a=getWrongIds(); if(!a.includes(id)){ a.push(id); localStorage.setItem(WRONG_KEY, JSON.stringify(a)); } }
 function removeWrong(id){ const a=getWrongIds(); if(a.includes(id)){ localStorage.setItem(WRONG_KEY, JSON.stringify(a.filter(x=>x!==id))); } }
+// ---------- 收藏 ----------
+function getFavIds(){ try { return JSON.parse(localStorage.getItem(getPrefix()+'favorites')||'[]'); } catch(e){ return []; } }
+function addFav(id){ const a=getFavIds(); if(!a.includes(id)){ a.push(id); localStorage.setItem(getPrefix()+'favorites', JSON.stringify(a)); } }
+function removeFav(id){ const a=getFavIds(); if(a.includes(id)){ localStorage.setItem(getPrefix()+'favorites', JSON.stringify(a.filter(x=>x!==id))); } }
+function isFav(id){ return getFavIds().includes(id); }
+function toggleFav(id){ isFav(id) ? removeFav(id) : addFav(id); return isFav(id); }
 // 每题连续答对次数
 function getStreaks(){ try { return JSON.parse(localStorage.getItem(STREAK_KEY)||'{}'); } catch(e){ return {}; } }
 function saveStreaks(s){ localStorage.setItem(STREAK_KEY, JSON.stringify(s)); }
@@ -509,7 +528,7 @@ async function loadBank(){
 
 function buildChapBar(){
   const bar = document.getElementById('chapbar');
-  if(mode!=='all' && mode!=='wrong'){ bar.style.display='none'; bar.innerHTML=''; return; }
+  if(mode!=='all' && mode!=='wrong' && mode!=='fav'){ bar.style.display='none'; bar.innerHTML=''; return; }
   bar.style.display='flex';
   let html = '<div class="chip '+(currentChapter==='__all__'?'active':'')+'" data-ch="__all__">全部</div>';
   for(const k of Object.keys(chapters)){
@@ -591,12 +610,14 @@ function buildCard(q){
   const tags = (q.tags||[]).map(t=>'<span class="tag">'+escapeHtml(t)+'</span>').join('');
   const opts = parseOptions(q).map(o=>'<div class="opt" data-key="'+o.key+'"><span class="optkey">'+o.key+'</span><span>'+escapeHtml(o.text)+'</span></div>').join('');
   el.innerHTML =
-    '<div class="qmeta"><span class="qtype">'+typeLabel+'</span>'+chapTitle+'<span class="tag" style="color:var(--sub)">第'+pos+'题</span>'+tags+'</div>'+
+    '<div class="qmeta"><span class="qtype">'+typeLabel+'</span>'+chapTitle+'<span class="tag" style="color:var(--sub)">第'+pos+'题</span>'+tags+'<span class="favstar'+(isFav(q.id)?' on':'')+'" data-id="'+q.id+'">'+(isFav(q.id)?'★':'☆')+'</span></div>'+
     '<div class="stem">'+escapeHtml(q.stem)+'</div>'+
     '<div class="opts">'+opts+'</div>'+
     '<div class="result res"></div>'+
     '<div class="analysis ans"><b>正确答案：</b>'+q.answer.join('、')+'<br><b>解析：</b>'+escapeHtml(q.analysis)+'<br><b>来源：</b>'+escapeHtml(q.source||'')+'</div>'+
     '<div class="btns"><button class="submit subbtn">提交</button></div>';
+  const fs = el.querySelector('.favstar');
+  if(fs) fs.addEventListener('click', function(e){ e.stopPropagation(); const id=this.dataset.id; const on=toggleFav(id); this.textContent=on?'★':'☆'; this.classList.toggle('on',on); showToast(on?'已收藏':'已取消收藏'); });
   let sel=[];
   const optEls = el.querySelectorAll('.opt');
   optEls.forEach(o=>o.addEventListener('click', ()=>{
@@ -631,6 +652,7 @@ function buildCard(q){
 function loadQuestions(){
   lastFinishClicked = false;
   if(mode==='wrong' && wrongListView){ renderWrongList(); return; }
+  if(mode==='fav' && wrongListView){ renderFavList(); return; }
   if(mode==='all'){ renderAllGrouped(); return; }
   let list = [];
   let startIdx = 0;
@@ -642,6 +664,10 @@ function loadQuestions(){
     if(fu > 0) startIdx = fu;
   } else if(mode==='wrong'){
     const ids = getWrongIds();
+    list = allList.filter(q=>ids.includes(q.id));
+    if(currentChapter!=='__all__') list = list.filter(q=>q.chapter===currentChapter);
+  } else if(mode==='fav'){
+    const ids = getFavIds();
     list = allList.filter(q=>ids.includes(q.id));
     if(currentChapter!=='__all__') list = list.filter(q=>q.chapter===currentChapter);
   }
@@ -672,6 +698,29 @@ function renderWrongList(){
   updateStat();
 }
 
+// 收藏章节列表视图：按章节汇总收藏数量，点击进入该章收藏题目练习
+function renderFavList(){
+  const app=document.getElementById('app');
+  const ids = getFavIds();
+  const favItems = allList.filter(q=>ids.includes(q.id));
+  const total = favItems.length;
+  const countMap = {};
+  for(const q of favItems){ countMap[q.chapter]=(countMap[q.chapter]||0)+1; }
+  let html = '<div class="card" style="padding:13px 14px;margin-bottom:12px;">'+
+    '<div class="qmeta"><span class="qtype">⭐ 收藏题库</span><span class="tag">共 '+total+' 道收藏</span></div>'+
+    '<div style="font-size:13px;color:var(--sub);margin-top:6px;">点下方章节，专练该章收藏题目：</div></div>';
+  html += '<div class="frow" data-ch="__all__"><span class="fname">全部收藏</span><span class="fcnt">（'+total+'）</span></div>';
+  for(const k of Object.keys(chapters)){
+    const n = countMap[k]||0;
+    html += '<div class="frow '+(n?'':'fzero')+'" data-ch="'+k+'"><span class="fname">'+escapeHtml(chapters[k])+'</span><span class="fcnt">（'+n+'）</span></div>';
+  }
+  app.innerHTML = html;
+  app.querySelectorAll('.frow').forEach(r=>{
+    r.addEventListener('click', ()=>{ currentChapter=r.dataset.ch; wrongListView=false; loadQuestions(); });
+  });
+  updateStat();
+}
+
 function render(){
   const app=document.getElementById('app');
   if(!questions.length){
@@ -679,6 +728,9 @@ function render(){
     if(mode==='wrong'){
       html += '<div class="backrow"><span id="backWrong">← 返回错题章节</span></div>';
       html += '<div class="empty">📭 本章暂无错题<br>做得好，继续保持！</div>';
+    } else if(mode==='fav'){
+      html += '<div class="backrow"><span id="backFav">← 返回收藏章节</span></div>';
+      html += '<div class="empty">⭐ 本章暂无收藏题目<br>点题目右上角的星标可收藏</div>';
     } else {
       html += '<div class="empty">该分类下还没有题目。<br>每日 00:00 会自动生成新题。</div>';
     }
@@ -686,6 +738,9 @@ function render(){
     updateStat();
     const bw=document.getElementById('backWrong');
     if(bw) bw.addEventListener('click', ()=>{ wrongListView=true; loadQuestions(); });
+    const bf=document.getElementById('backFav');
+    if(bf) bf.addEventListener('click', ()=>{ wrongListView=true; loadQuestions(); });
+    if(mode==='fav'){ document.getElementById('stat').textContent='收藏题数 '+questions.length; }
     return;
   }
   const q = questions[idx];
@@ -720,6 +775,7 @@ function render(){
   const chNumTag = '<span class="tag" style="color:var(--warn);font-weight:600">第'+chPos+'题</span>';
   let prefix='';
   if(mode==='wrong'){ prefix='<div class="backrow"><span id="backWrong">← 返回错题章节</span></div>'; }
+  if(mode==='fav'){ prefix='<div class="backrow"><span id="backFav">← 返回收藏章节</span></div>'; }
   // 今日练习：单选区→多选区交界处显示题型分隔标识
   let sep='';
   if(mode==='today'){
@@ -730,7 +786,7 @@ function render(){
     }
   }
   let html = prefix + sep + '<div class="card">';
-  html += '<div class="qmeta"><span class="qtype">'+typeLabel+'</span>'+chapTitle+chNumTag+tags+'</div>';
+  html += '<div class="qmeta"><span class="qtype">'+typeLabel+'</span>'+chapTitle+chNumTag+tags+'<span class="favstar'+(isFav(q.id)?' on':'')+'" id="favStar" data-id="'+q.id+'">'+(isFav(q.id)?'★':'☆')+'</span></div>';
   html += '<div class="stem">'+ (idx+1)+'. '+escapeHtml(q.stem)+'</div>';
   html += '<div id="opts">'+opts+'</div>';
   const qCorrect = isResultCorrect(q.id);
@@ -793,6 +849,10 @@ function bind(){
   if(nvb) nvb.addEventListener('click', showNav);
   const bw=document.getElementById('backWrong');
   if(bw) bw.addEventListener('click', ()=>{ wrongListView=true; loadQuestions(); });
+  const bf=document.getElementById('backFav');
+  if(bf) bf.addEventListener('click', ()=>{ wrongListView=true; loadQuestions(); });
+  const fs=document.getElementById('favStar');
+  if(fs) fs.addEventListener('click', function(e){ e.stopPropagation(); const id=this.dataset.id; const on=toggleFav(id); this.textContent=on?'★':'☆'; this.classList.toggle('on',on); showToast(on?'已收藏':'已取消收藏'); });
   // 左右滑动切换题目
   const card=document.querySelector('.card');
   if(card){
@@ -967,7 +1027,8 @@ function updateThemeBtn(){
   if(!b) return;
   const t=getTheme();
   b.textContent = t==='dark' ? '🌙 夜间' : '☀ 日间';
-  b.classList.toggle('on', t==='dark');
+  b.classList.remove('on','day');
+  b.classList.add(t==='dark'?'on':'day');
 }
 
 // 模式切换
