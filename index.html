@@ -272,9 +272,9 @@ function initKeys(){
 const BANK = { today:'', all:'', index:'' };
 function updateBank(){
   // 相对路径: 本地服务 + GitHub Pages 都适用
-  BANK.today = subject==='安装' ? '题库/today.json' : '管理刷题/题库/today.json';
-  BANK.all  = subject==='安装' ? '题库/all_questions.js' : '管理刷题/题库/all_questions.js';
-  BANK.index = subject==='安装' ? '题库/index.json' : '管理刷题/题库/index.json';
+  BANK.today = subject==='安装' ? '安装刷题/题库/today.json' : '管理刷题/题库/today.json';
+  BANK.all  = subject==='安装' ? '安装刷题/题库/all_questions.js' : '管理刷题/题库/all_questions.js';
+  BANK.index = subject==='安装' ? '安装刷题/题库/index.json' : '管理刷题/题库/index.json';
 }
 function updateUI(){
   document.getElementById('h1title').textContent='广东二造·'+subject+'刷题';
