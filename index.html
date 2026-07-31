@@ -534,11 +534,10 @@ async function loadBank(){
   document.getElementById('app').innerHTML = '<div class="empty">⏳ 加载题库中…<\/div>';
   // 安全超时：15秒后强制解锁界面
   const safeTimer = setTimeout(() => { isLoading = false; }, 15000);
-  try {
-    const ri = await fetch(BANK.index); const meta = await ri.json();
+  try { const ri = await fetch(BANK.index); const meta = await ri.json();
     chapters = meta.chapters || {};
   } catch(e){ chapters = {}; }
-  try { const rt = await fetch(BANK.today); todayList = await rt.json(); } catch(e){ todayList = []; }
+  todayList = []; // today.json 不存在，直接空数组
   // 用 script 加载 .js 题库(比 fetch 更快,手机大文件更可靠)
   try {
     await new Promise((resolve, reject) => {
