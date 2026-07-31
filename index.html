@@ -531,27 +531,42 @@ function shuffle(arr){
 
 async function loadBank(){
   isLoading = true;
-  document.getElementById('app').innerHTML = '<div class="empty">⏳ 加载题库中…<\/div>';
-  // 安全超时：15秒后强制解锁界面
-  const safeTimer = setTimeout(() => { isLoading = false; }, 15000);
+  document.getElementById('app').innerHTML = '<div class="empty">⏳ 加载题库中…</div>';
+  const safeTimer = setTimeout(() => { isLoading = false; }, 20000);
   try { const ri = await fetch(BANK.index); const meta = await ri.json();
     chapters = meta.chapters || {};
   } catch(e){ chapters = {}; }
-  todayList = []; // today.json 不存在，直接空数组
-  // 用 script 加载 .js 题库(比 fetch 更快,手机大文件更可靠)
+  todayList = [];
+  // 加载题库: fetch纯文本后eval注入window.__BANK__
+  let loaded = false;
+  // 方式1: fetch text + eval
   try {
-    await new Promise((resolve, reject) => {
-      const old = document.getElementById('_bank_loader');
-      if(old) old.remove();
-      const s = document.createElement('script');
-      s.id = '_bank_loader';
-      s.src = BANK.all.replace('.json','.js');
-      s.onload = resolve;
-      s.onerror = () => reject(new Error('bank load failed'));
-      document.head.appendChild(s);
-    });
-    allList = window.__BANK__ || [];
-  } catch(e){ allList = []; }
+    const resp = await fetch(BANK.all);
+    if(resp.ok){
+      const text = await resp.text();
+      // 提取 window.__BANK__ = [...] 中的数组
+      const m = text.match(/window\.__BANK__\s*=\s*(\[[\s\S]*\])\s*;?\s*$/);
+      if(m){ allList = eval(m[1]); loaded = true; }
+    }
+  } catch(e){ console.warn('fetch bank failed, trying script tag', e); }
+  // 方式2: 备用script标签
+  if(!loaded){
+    try {
+      await new Promise((resolve, reject) => {
+        const old = document.getElementById('_bank_loader');
+        if(old) old.remove();
+        const s = document.createElement('script');
+        s.id = '_bank_loader';
+        s.src = BANK.all;
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('script load failed'));
+        document.head.appendChild(s);
+      });
+      allList = window.__BANK__ || [];
+      loaded = true;
+    } catch(e){ allList = []; console.warn('script bank failed', e); }
+  }
+  if(!loaded) allList = allList || [];
   // 计算每道题在章节内的排序位置
   chapterPosMap = {};
   const chapGroups = {};
