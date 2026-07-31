@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>广东二造·安装刷题 v075</title>
+<title>广东二造·安装刷题 v076</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root, html[data-theme="dark"] {
@@ -531,57 +531,83 @@ function shuffle(arr){
 
 async function loadBank(){
   isLoading = true;
+  console.log('[loadBank] START, subject='+subject+', mode='+mode);
   document.getElementById('app').innerHTML = '<div class="empty">⏳ 加载题库中…<\/div>';
-  const safeTimer = setTimeout(() => { isLoading = false; }, 20000);
+  const safeTimer = setTimeout(() => { console.warn('[loadBank] TIMEOUT'); isLoading = false; }, 25000);
+
+  // 1. 加载章节索引
   try { const ri = await fetch(BANK.index); const meta = await ri.json();
     chapters = meta.chapters || {};
-  } catch(e){ chapters = {}; }
+    console.log('[loadBank] chapters loaded:', Object.keys(chapters).length);
+  } catch(e){ chapters = {}; console.error('[loadBank] index fetch failed', e); }
   todayList = [];
-  // 加载题库：主方案用script标签（原生JS引擎解析2MB+大文件最高效）
+
+  // 2. 加载题库
   let loaded = false;
+  console.log('[loadBank] fetching bank:', BANK.all);
+
+  // 方案A: fetch text + indexOf + JSON.parse (可靠，无正则回溯)
   try {
-    await new Promise((resolve, reject) => {
-      const old = document.getElementById('_bank_loader');
-      if(old) old.remove();
-      const s = document.createElement('script');
-      s.id = '_bank_loader';
-      s.src = BANK.all + '?v=074';
-      s.onload = () => { window.__BANK__ ? resolve() : reject(new Error('no bank')); };
-      s.onerror = () => reject(new Error('script load failed'));
-      document.head.appendChild(s);
-    });
-    allList = window.__BANK__ || [];
-    loaded = true;
-  } catch(e){ console.warn('script bank failed, trying fetch', e); }
-  // 备选：fetch + JSON.parse
-  if(!loaded){
-    try {
-      const resp = await fetch(BANK.all);
-      if(resp.ok){
-        const text = await resp.text();
-        const prefix = 'window.__BANK__=';
-        const idx = text.indexOf(prefix);
-        if(idx >= 0){
-          let json = text.substring(idx + prefix.length).trim();
-          if(json.endsWith(';')) json = json.slice(0, -1).trim();
-          allList = JSON.parse(json);
-          loaded = true;
-        }
+    const resp = await fetch(BANK.all);
+    console.log('[loadBank] fetch status:', resp.status, 'size:', resp.headers.get('content-length'));
+    if(resp.ok){
+      const text = await resp.text();
+      console.log('[loadBank] fetched text length:', text.length);
+      const prefix = 'window.__BANK__=';
+      const idx = text.indexOf(prefix);
+      console.log('[loadBank] prefix index:', idx);
+      if(idx >= 0){
+        let json = text.substring(idx + prefix.length);
+        // 去掉末尾的分号
+        json = json.replace(/;?\s*$/, '');
+        console.log('[loadBank] json start:', json.substring(0,50));
+        console.log('[loadBank] json end:', json.substring(json.length-50));
+        allList = JSON.parse(json);
+        loaded = true;
+        console.log('[loadBank] JSON.parse success, questions:', allList.length);
+      } else {
+        console.error('[loadBank] prefix not found in response');
       }
-    } catch(e){ console.warn('fetch+parse failed', e); allList = []; }
+    }
+  } catch(e){ console.error('[loadBank] fetch+parse failed', e); allList = []; }
+
+  // 方案B: script标签备用
+  if(!loaded){
+    console.log('[loadBank] trying script tag fallback');
+    try {
+      await new Promise((resolve, reject) => {
+        const old = document.getElementById('_bank_loader');
+        if(old) old.remove();
+        const s = document.createElement('script');
+        s.id = '_bank_loader';
+        s.src = BANK.all;
+        s.onload = () => { console.log('[loadBank] script loaded, __BANK__:', window.__BANK__?window.__BANK__.length:'undefined'); window.__BANK__ ? resolve() : reject(new Error('no bank')); };
+        s.onerror = (ev) => { console.error('[loadBank] script load error', ev); reject(new Error('script load failed')); };
+        document.head.appendChild(s);
+      });
+      allList = window.__BANK__ || [];
+      loaded = true;
+      console.log('[loadBank] script tag success, questions:', allList.length);
+    } catch(e){ console.error('[loadBank] script fallback failed', e); allList = []; }
   }
-  if(!loaded) allList = allList || [];
-  // 计算每道题在章节内的排序位置
+
+  if(allList.length === 0){
+    console.error('[loadBank] BANK IS EMPTY! loaded='+loaded);
+  }
+
+  // 3. 计算每道题在章节内的排序位置
   chapterPosMap = {};
   const chapGroups = {};
   for(const q of allList){ if(!chapGroups[q.chapter]) chapGroups[q.chapter]=[]; chapGroups[q.chapter].push(q); }
   for(const ch of Object.keys(chapGroups)){ chapGroups[ch].sort((a,b)=>seqOf(a)-seqOf(b)); chapGroups[ch].forEach((q,i)=>{ chapterPosMap[q.id]=i+1; }); }
+
   buildChapBar();
   loadQuestions();
   renderCheckin();
   updateStat();
   clearTimeout(safeTimer);
   isLoading = false;
+  console.log('[loadBank] DONE, allList:', allList.length, 'questions:', questions.length);
 }
 
 function buildChapBar(){
