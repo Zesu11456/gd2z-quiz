@@ -531,7 +531,7 @@ function shuffle(arr){
 
 async function loadBank(){
   isLoading = true;
-  document.getElementById('app').innerHTML = '<div class="empty">⏳ 加载题库中…</div>';
+  document.getElementById('app').innerHTML = '<div class="empty">⏳ 加载题库中…<\/div>';
   const safeTimer = setTimeout(() => { isLoading = false; }, 20000);
   try { const ri = await fetch(BANK.index); const meta = await ri.json();
     chapters = meta.chapters || {};
