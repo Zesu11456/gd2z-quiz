@@ -35,12 +35,12 @@
   }
   body { margin:0; background:var(--bg); color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; padding:8px; }
   header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; gap:6px; }
-  h1 { font-size:16px; margin:0; flex:1; }
+  h1 { font-size:15px; margin:0; flex:1; }
   .headbtns { display:flex; gap:6px; }
-  .headbtn { font-size:12px; padding:6px 10px; background:var(--headbtn-bg); color:var(--sub); border:1px solid var(--line); border-radius:8px; cursor:pointer; white-space:nowrap; }
+  .headbtn { font-size:11px; padding:5px 8px; background:var(--headbtn-bg); color:var(--sub); border:1px solid var(--line); border-radius:7px; cursor:pointer; white-space:nowrap; }
   .headbtn.on { color:var(--ok); border-color:var(--ok); background:var(--ok-bg); border-width:1.5px; font-weight:600; }
   .headbtn.day { color:var(--blue); border-color:var(--blue); background:var(--primary-bg); border-width:1.5px; font-weight:600; }
-  .stat { font-size:12px; color:var(--sub); width:100%; text-align:right; margin-bottom:6px; }
+  .stat { display:none; }
   .modes { display:flex; gap:6px; margin-bottom:6px; flex-wrap:wrap; }
   .mode { flex:1; min-width:52px; text-align:center; padding:7px 3px; background:var(--card); border:1px solid var(--line); border-radius:8px; font-size:11px; color:var(--sub); cursor:pointer; }
   .mode.active { color:var(--primary-tx); border-color:var(--primary); background:var(--primary-bg); }
@@ -131,8 +131,8 @@
   .toast.show { opacity:1; }
   .chap-start { width:100%; margin-top:10px; background:var(--ok); color:#04130a; }
   /* 全部题库：按章节分组 */
-  .cblock { margin-bottom:10px; }
-  .chead { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--card); border:1px solid var(--line); border-radius:12px; cursor:pointer; font-size:15px; font-weight:600; }
+  .cblock { margin-bottom:6px; }
+  .chead { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--card); border:1px solid var(--line); border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; }
   .chead:active { border-color:var(--blue); }
   .chead .ctitle { flex:1; }
   .chead .cnavbtn { padding:4px 8px; cursor:pointer; color:var(--sub); border-radius:6px; display:flex; align-items:center; margin:0 8px; }
@@ -142,7 +142,7 @@
   .qcard { margin-bottom:12px; }
   .goalhint { font-size:11px; color:var(--sub); text-align:center; margin-top:6px; }
   /* 错题本章节列表 */
-  .wrow { display:flex; align-items:center; gap:6px; padding:14px 16px; background:var(--card); border:1px solid var(--line); border-radius:12px; margin-bottom:10px; font-size:15px; cursor:pointer; line-height:1.45; }
+  .wrow { display:flex; align-items:center; gap:6px; padding:12px 14px; background:var(--card); border:1px solid var(--line); border-radius:10px; margin-bottom:6px; font-size:14px; cursor:pointer; line-height:1.4; }
   .wrow:active { border-color:#ffa94d; }
   .wrow .wname { flex:1; }
   .wrow .wcnt { color:#ffa94d; font-size:14px; font-weight:700; white-space:nowrap; }
@@ -165,7 +165,7 @@
   .favstar { cursor:pointer; font-size:18px; user-select:none; margin-left:auto; color:var(--sub); transition:.2s; flex:none; }
   .favstar.on { color:#f1c40f; }
   .favlist { margin-bottom:12px; }
-  .frow { display:flex; align-items:center; gap:6px; padding:14px 16px; background:var(--card); border:1px solid var(--line); border-radius:12px; margin-bottom:10px; font-size:15px; cursor:pointer; line-height:1.45; }
+  .frow { display:flex; align-items:center; gap:6px; padding:12px 14px; background:var(--card); border:1px solid var(--line); border-radius:10px; margin-bottom:6px; font-size:14px; cursor:pointer; line-height:1.4; }
   .frow:active { border-color:var(--warn); }
   .frow .fname { flex:1; }
   .frow .fcnt { color:var(--warn); font-size:14px; font-weight:700; white-space:nowrap; }
