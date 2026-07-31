@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>广东二造·安装刷题 v074</title>
+<title>广东二造·安装刷题 v073</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root, html[data-theme="dark"] {
@@ -537,39 +537,38 @@ async function loadBank(){
     chapters = meta.chapters || {};
   } catch(e){ chapters = {}; }
   todayList = [];
-  // 加载题库: fetch纯文本后用JSON.parse提取
+  // 加载题库：主方案用script标签（原生JS引擎解析2MB+大文件最高效）
   let loaded = false;
-  // 方式1: fetch text + JSON.parse
   try {
-    const resp = await fetch(BANK.all);
-    if(resp.ok){
-      const text = await resp.text();
-      const prefix = 'window.__BANK__=';
-      const idx = text.indexOf(prefix);
-      if(idx >= 0){
-        let json = text.substring(idx + prefix.length).trim();
-        if(json.endsWith(';')) json = json.slice(0, -1).trim();
-        allList = JSON.parse(json);
-        loaded = true;
-      }
-    }
-  } catch(e){ console.warn('fetch bank failed, trying script tag', e); }
-  // 方式2: 备用script标签
+    await new Promise((resolve, reject) => {
+      const old = document.getElementById('_bank_loader');
+      if(old) old.remove();
+      const s = document.createElement('script');
+      s.id = '_bank_loader';
+      s.src = BANK.all + '?v=074';
+      s.onload = () => { window.__BANK__ ? resolve() : reject(new Error('no bank')); };
+      s.onerror = () => reject(new Error('script load failed'));
+      document.head.appendChild(s);
+    });
+    allList = window.__BANK__ || [];
+    loaded = true;
+  } catch(e){ console.warn('script bank failed, trying fetch', e); }
+  // 备选：fetch + JSON.parse
   if(!loaded){
     try {
-      await new Promise((resolve, reject) => {
-        const old = document.getElementById('_bank_loader');
-        if(old) old.remove();
-        const s = document.createElement('script');
-        s.id = '_bank_loader';
-        s.src = BANK.all;
-        s.onload = resolve;
-        s.onerror = () => reject(new Error('script load failed'));
-        document.head.appendChild(s);
-      });
-      allList = window.__BANK__ || [];
-      loaded = true;
-    } catch(e){ allList = []; console.warn('script bank failed', e); }
+      const resp = await fetch(BANK.all);
+      if(resp.ok){
+        const text = await resp.text();
+        const prefix = 'window.__BANK__=';
+        const idx = text.indexOf(prefix);
+        if(idx >= 0){
+          let json = text.substring(idx + prefix.length).trim();
+          if(json.endsWith(';')) json = json.slice(0, -1).trim();
+          allList = JSON.parse(json);
+          loaded = true;
+        }
+      }
+    } catch(e){ console.warn('fetch+parse failed', e); allList = []; }
   }
   if(!loaded) allList = allList || [];
   // 计算每道题在章节内的排序位置
