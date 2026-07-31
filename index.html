@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>广东二造·安装刷题 v073</title>
+<title>广东二造·安装刷题 v074</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root, html[data-theme="dark"] {
@@ -537,16 +537,21 @@ async function loadBank(){
     chapters = meta.chapters || {};
   } catch(e){ chapters = {}; }
   todayList = [];
-  // 加载题库: fetch纯文本后eval注入window.__BANK__
+  // 加载题库: fetch纯文本后用JSON.parse提取
   let loaded = false;
-  // 方式1: fetch text + eval
+  // 方式1: fetch text + JSON.parse
   try {
     const resp = await fetch(BANK.all);
     if(resp.ok){
       const text = await resp.text();
-      // 提取 window.__BANK__ = [...] 中的数组
-      const m = text.match(/window\.__BANK__\s*=\s*(\[[\s\S]*\])\s*;?\s*$/);
-      if(m){ allList = eval(m[1]); loaded = true; }
+      const prefix = 'window.__BANK__=';
+      const idx = text.indexOf(prefix);
+      if(idx >= 0){
+        let json = text.substring(idx + prefix.length).trim();
+        if(json.endsWith(';')) json = json.slice(0, -1).trim();
+        allList = JSON.parse(json);
+        loaded = true;
+      }
     }
   } catch(e){ console.warn('fetch bank failed, trying script tag', e); }
   // 方式2: 备用script标签
