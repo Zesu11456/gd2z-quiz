@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>广东二造·安装刷题 v077</title>
+<title>广东二造·安装刷题 v078</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root, html[data-theme="dark"] {
@@ -804,12 +804,8 @@ function render(){
     return;
   }
   const q = questions[idx];
-  const res = getResults()[q.id];
-  // 已答题：全局恢复选择状态(不限today模式)
-  if(!answered){
-    const sv=getSavedSelection(q.id);
-    if(sv){ selected=sv.selected||[]; answered=true; }
-  }
+  // 已答状态由 loadSelection 按模式统一管理：
+  //   today → 依据 ts.answered；wrong/fav → 练习模式每次重新作答；不在此处从 getResults 恢复
   // 今日练习：已答过的题直接显示对错状态（而非从零作答），每日学完打卡后出现"重新学习"按钮
   let isDailyComplete = false;
   if(mode==='today'){
@@ -988,7 +984,23 @@ function goPrev(){
   if(idx>0){ idx--; loadSelection(); render(); }
 }
 function loadSelection(){
-  const saved=getSavedSelection(questions[idx].id);
+  const q=questions[idx];
+  if(!q) return;
+  // 错题本/收藏：练习模式，每次从头作答，不恢复已答状态
+  if(mode==='wrong' || mode==='fav'){ selected=[]; answered=false; return; }
+  // 今日练习：以今日题集是否已答为准
+  if(mode==='today'){
+    const ts=readTodaySet();
+    if(ts && ts.date===todayStr() && (ts.answered||[]).includes(q.id)){
+      const saved=getSavedSelection(q.id);
+      selected=(saved&&saved.selected)||[]; answered=true;
+    } else {
+      selected=[]; answered=false;
+    }
+    return;
+  }
+  // 全部题库等：恢复已答状态
+  const saved=getSavedSelection(q.id);
   if(saved){ selected=saved.selected||[]; answered=true; }
   else { selected=[]; answered=false; }
 }
