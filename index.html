@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>广东二造·安装刷题 v076</title>
+<title>广东二造·安装刷题 v077</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root, html[data-theme="dark"] {
@@ -466,31 +466,7 @@ function isResultCorrect(qid){
 }
 function updateStat(){
   updateCounter();
-  if(mode==='today'){
-    const ds = getDailyScore();
-    const total = ds.correct + ds.wrong;
-    if(total===0){ document.getElementById('stat').textContent='今日正确率 --'; return; }
-    document.getElementById('stat').textContent = '今日正确率 '+Math.round(ds.correct/total*100)+'% ('+ds.correct+'/'+total+')';
-    return;
-  }
-  if(mode==='all'){
-    const r = getResults();
-    const ch = (currentChapter!=='__all__') ? currentChapter : null;
-    let total=0, ok=0;
-    for(const q of allList){
-      if(ch && q.chapter!==ch) continue;
-      if(r[q.id]!==undefined){ total++; if(isResultCorrect(q.id)) ok++; }
-    }
-    if(total===0){ document.getElementById('stat').textContent=ch?(chapters[ch]?'第'+(Object.keys(chapters).indexOf(ch)+1)+'章正确率 --':'正确率 --'):'正确率 --'; return; }
-    const label = ch ? (chapters[ch]?chapters[ch].replace(/^第.+?章 /,'')+' 正确率':'正确率') : '累计正确率';
-    document.getElementById('stat').textContent = label+' '+Math.round(ok/total*100)+'% ('+ok+'/'+total+')';
-    return;
-  }
-  // 错题本等：显示全局正确率
-  const r = getResults(); const vals = Object.values(r);
-  if(!vals.length){ document.getElementById('stat').textContent='正确率 --'; return; }
-  const ok = vals.filter(v=> (typeof v==='boolean')? v : !!v.correct).length;
-  document.getElementById('stat').textContent = '正确率 '+Math.round(ok/vals.length*100)+'% ('+ok+'/'+vals.length+')';
+  // stat元素已移除，只更新计数器
 }
 
 // ---------- 答题计数器 ----------
@@ -824,7 +800,7 @@ function render(){
     if(bw) bw.addEventListener('click', ()=>{ wrongListView=true; loadQuestions(); });
     const bf=document.getElementById('backFav');
     if(bf) bf.addEventListener('click', ()=>{ wrongListView=true; loadQuestions(); });
-    if(mode==='fav'){ document.getElementById('stat').textContent='收藏题数 '+questions.length; }
+    if(mode==='fav'){ /* stat element removed */ }
     return;
   }
   const q = questions[idx];
