@@ -82,7 +82,7 @@
   .counter .cbox.ok b { color:var(--ok); }
   .counter .cbox.err b { color:var(--err); }
   .counter .cbox.rate b { color:var(--blue); }
-  .analysis { margin-top:10px; padding:10px; background:var(--opt-bg); border-left:3px solid var(--warn); border-radius:6px; font-size:12px; line-height:1.55; display:none; }
+  .analysis { margin-top:10px; padding:10px; background:var(--opt-bg); border-left:3px solid var(--warn); border-radius:6px; font-size:12px; line-height:1.55; display:none; word-break:break-all; overflow-wrap:break-word; }
   .analysis.show { display:block; }
   .analysis b { color:var(--warn); }
   .result { text-align:center; font-size:16px; font-weight:700; margin:10px 0; display:none; }
@@ -674,7 +674,7 @@ function buildCard(q){
     '<div class="stem">'+escapeHtml(q.stem)+'</div>'+
     '<div class="opts">'+opts+'</div>'+
     '<div class="result res"></div>'+
-    '<div class="analysis ans"><b>正确答案：</b>'+q.answer.join('、')+'<br><b>解析：</b>'+escapeHtml(q.analysis)+'<br><b>来源：</b>'+escapeHtml(q.source||'')+'</div>'+
+    '<div class="analysis ans"><b>正确答案：</b>'+q.answer.join('、')+'<br><b>解析：</b>'+escapeHtml(q.analysis).replace(/\n/g,'<br>')+'<br><b>来源：</b>'+escapeHtml(q.source||'')+'</div>'+
     '<div class="btns"><button class="submit subbtn">提交</button></div>';
   const fs = el.querySelector('.favstar');
   if(fs) fs.addEventListener('click', function(e){ e.stopPropagation(); const id=this.dataset.id; const on=toggleFav(id); this.textContent=on?'★':'☆'; this.classList.toggle('on',on); showToast(on?'已收藏':'已取消收藏'); });
@@ -847,7 +847,7 @@ function render(){
   html += '<div id="opts">'+opts+'</div>';
   const qCorrect = isResultCorrect(q.id);
   html += '<div class="result '+(answered?(qCorrect?'ok':'no'):'')+(answered?' show':'')+'" id="result">'+(answered?(qCorrect?'✓ 回答正确':'✗ 回答错误'):'')+'</div>';
-  html += '<div class="analysis '+(answered?'show':'')+'" id="analysis"><b>正确答案：</b>'+q.answer.join('、')+'<br><b>解析：</b>'+escapeHtml(q.analysis)+'<br><b>来源：</b>'+escapeHtml(q.source||'')+'</div>';
+  html += '<div class="analysis '+(answered?'show':'')+'" id="analysis"><b>正确答案：</b>'+q.answer.join('、')+'<br><b>解析：</b>'+escapeHtml(q.analysis).replace(/\n/g,'<br>')+'<br><b>来源：</b>'+escapeHtml(q.source||'')+'</div>';
   html += '<div class="btns">';
   if(isDailyComplete && lastFinishClicked){
     html += '<button class="restart" id="restartBtn">重新练习</button>';
