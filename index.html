@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>广东二造·安装刷题 v087</title>
+<title>广东二造·安装刷题 v088</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root, html[data-theme="dark"] {
@@ -296,7 +296,7 @@ const BANK = { today:'', all:'', index:'' };
 function updateBank(){
   // 相对路径: 本地服务 + GitHub Pages 都适用
   // 版本号参数: 每次升级改 VER 即可强制绕过浏览器/微信缓存
-  const VER = '087';
+  const VER = '088';
   BANK.today = subject==='安装' ? '安装刷题/题库/today.json?v='+VER : '管理刷题/题库/today.json?v='+VER;
   BANK.all  = subject==='安装' ? '安装刷题/题库/all_questions.js?v='+VER : '管理刷题/题库/all_questions.js?v='+VER;
   BANK.index = subject==='安装' ? '安装刷题/题库/index.json?v='+VER : '管理刷题/题库/index.json?v='+VER;
@@ -1022,14 +1022,25 @@ function onTouchEnd(e){
 function showNav(){
   const grid = document.getElementById('navGrid');
   const res = getResults();
+  // 今日练习模式：导航器颜色只依据"今日已答"状态，避免历史答题记录干扰
+  const ts = (mode==='today') ? readTodaySet() : null;
+  const todayAnswered = (ts && ts.date===todayStr()) ? ts.answered : [];
   let html = '';
   for(let i=0; i<questions.length; i++){
     const q = questions[i];
     const r = res[q.id];
     let dotCls = 'navdot';
     if(i===idx) dotCls += ' current';
-    if(r && (typeof r==='boolean'? r : r.correct)) dotCls += ' correct';
-    else if(r!==undefined) dotCls += ' wrong';
+    if(mode==='today'){
+      // 今日模式：仅今日答过的题显示对错；未答保持灰色
+      if(todayAnswered.includes(q.id)){
+        if(r && (typeof r==='boolean'? r : r.correct)) dotCls += ' correct';
+        else dotCls += ' wrong';
+      }
+    } else {
+      if(r && (typeof r==='boolean'? r : r.correct)) dotCls += ' correct';
+      else if(r!==undefined) dotCls += ' wrong';
+    }
     html += '<div class="'+dotCls+'" data-i="'+i+'">'+(i+1)+(isFav(q.id)?'<span class="navstar">★</span>':'')+'</div>';
   }
   grid.innerHTML = html;
